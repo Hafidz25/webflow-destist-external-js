@@ -1,23 +1,11 @@
-// Add Swiper CSS dynamically
-const swiperCSS = document.createElement('link');
-swiperCSS.rel = 'stylesheet';
-swiperCSS.href = 'https://unpkg.com/swiper@8/swiper-bundle.min.css';
-document.head.appendChild(swiperCSS);
+// swiper-config.js
 
-// Load Swiper JS dynamically
-const swiperJS = document.createElement('script');
-swiperJS.src = 'https://unpkg.com/swiper@8/swiper-bundle.min.js';
-document.head.appendChild(swiperJS);
-
-// Initialize everything after resources are loaded
-swiperJS.onload = function() {
+function initializeSwiper() {
   // Remove hide-slide class from all slides
-  document.addEventListener('DOMContentLoaded', function() {
-    var swiperSlides = document.querySelectorAll('.swiper-slide');
-    
-    swiperSlides.forEach(function(slide) {
-      slide.classList.remove('hide-slide');
-    });
+  var swiperSlides = document.querySelectorAll('.swiper-slide');
+  
+  swiperSlides.forEach(function(slide) {
+    slide.classList.remove('hide-slide');
   });
 
   // Initialize Swiper
@@ -34,38 +22,23 @@ swiperJS.onload = function() {
       slideChange: function () {
         let activeIndex = this.activeIndex;
 
-        // Handle text-slide elements
-        document.querySelectorAll('.text-slide').forEach(function(text) {
-          text.style.opacity = '0';
-          text.style.display = 'none';
-        });
-        let activeText = document.querySelector('.text-slide[data-index="' + activeIndex + '"]');
-        if (activeText) {
-          activeText.style.opacity = '1';
-          activeText.style.display = 'block';
+        // Function to handle text elements
+        function handleTextElements(className) {
+          document.querySelectorAll(className).forEach(function(text) {
+            text.style.opacity = '0';
+            text.style.display = 'none';
+          });
+          let activeElement = document.querySelector(className + '[data-index="' + activeIndex + '"]');
+          if (activeElement) {
+            activeElement.style.opacity = '1';
+            activeElement.style.display = 'block';
+          }
         }
-        
-        // Handle text-slide-name elements
-        document.querySelectorAll('.text-slide-name').forEach(function(text) {
-          text.style.opacity = '0';
-          text.style.display = 'none';
-        });
-        let activeTextName = document.querySelector('.text-slide-name[data-index="' + activeIndex + '"]');
-        if (activeTextName) {
-          activeTextName.style.opacity = '1';
-          activeTextName.style.display = 'block';
-        }
-        
-        // Handle text-slide-job elements
-        document.querySelectorAll('.text-slide-job').forEach(function(text) {
-          text.style.opacity = '0';
-          text.style.display = 'none';
-        });
-        let activeTextJob = document.querySelector('.text-slide-job[data-index="' + activeIndex + '"]');
-        if (activeTextJob) {
-          activeTextJob.style.opacity = '1';
-          activeTextJob.style.display = 'block';
-        }
+
+        // Handle all text elements
+        handleTextElements('.text-slide');
+        handleTextElements('.text-slide-name');
+        handleTextElements('.text-slide-job');
       }
     }
   });
@@ -74,4 +47,32 @@ swiperJS.onload = function() {
   window.goToSlide = function(slideIndex) {
     photoSwiper.slideTo(slideIndex);
   };
-};
+}
+
+// Load Swiper resources and initialize
+function loadSwiperResources() {
+  // Check if Swiper is already loaded
+  if (typeof Swiper === 'function') {
+    initializeSwiper();
+    return;
+  }
+
+  // Load CSS
+  const swiperCSS = document.createElement('link');
+  swiperCSS.rel = 'stylesheet';
+  swiperCSS.href = 'https://unpkg.com/swiper@8/swiper-bundle.min.css';
+  document.head.appendChild(swiperCSS);
+
+  // Load JS
+  const swiperJS = document.createElement('script');
+  swiperJS.src = 'https://unpkg.com/swiper@8/swiper-bundle.min.js';
+  swiperJS.onload = initializeSwiper;
+  document.head.appendChild(swiperJS);
+}
+
+// Start loading when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadSwiperResources);
+} else {
+  loadSwiperResources();
+}
